@@ -5,53 +5,54 @@ import { axiosClient } from '../api';
 import { useStateContext } from '../context/ContextProvider';
 
 export default function Signup() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const {setUser, setToken } = useStateContext();
-  
-  const nameRef = useRef();
-  const emailRef = useRef();
-  const passwordRef = useRef();
-  const confirmPasswordRef = useRef();
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [errors, setErrors] = useState({}); // State to store validation errors
+  const [loading, setLoading] = useState(false); // State to manage loading during form submission
+  const { setUser, setToken } = useStateContext(); // Access global state context for user and token
+
+  const nameRef = useRef(); // Ref for name input
+  const emailRef = useRef(); // Ref for email input
+  const passwordRef = useRef(); // Ref for password input
+  const confirmPasswordRef = useRef(); // Ref for confirm password input
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    setErrors({});
-    setLoading(true);
-
+    e.preventDefault(); // Prevent default form submission
+    setErrors({}); // Clear previous errors
+    setLoading(true); // Set loading state to true
+  
     const payload = {
       name: nameRef.current.value,
       email: emailRef.current.value,
       password: passwordRef.current.value,
-      password_confirmation: confirmPasswordRef.current.value
-    }
-
-    axiosClient.post("/signup", payload)
-    .then(({data}) => {
-      setUser(data.user)
-      setToken(data.token)
-    })
-    .catch((err) => {
-      setLoading(false);
-      const response = err.response;
-      console.error('Signup error:', err);
-      if (response && response.status === 422) {
-        setErrors(response.data.errors);
-      } else {
-        setErrors({
-          general: 'Something went wrong. Please try again later.'
-        });
-      }
-    });
-    console.log(payload);
-  }
+      password_confirmation: confirmPasswordRef.current.value,
+    };
+  
+    axiosClient
+      .post('/signup', payload) // Make a POST request to the signup endpoint
+      .then(({ data }) => {
+        setUser(data.user); // Update global user state
+        setToken(data.token); // Update global token state
+      })
+      .catch((err) => {
+        setLoading(false); // Reset loading state on error
+        const response = err.response;
+        console.error('Signup error:', err); // Log the error for debugging
+        if (response && response.status === 422) {
+          setErrors(response.data.errors); // Set validation errors from the backend
+        } else {
+          setErrors({
+            general: 'Something went wrong. Please try again later.', // Set general error message
+          });
+        }
+      });
+  };
 
   return (
     <div className="container flex items-center justify-center min-h-screen px-4">
       <div className="w-full max-w-md p-6 bg-white shadow-2xl rounded-2xl">
         <h1 className="mt-4 text-2xl font-bold text-center">Create your account</h1>
         
+        {/* Display general errors */}
         {errors.general && (
           <div className="p-2 mt-4 text-sm text-red-600 bg-red-100 rounded">
             {errors.general}
@@ -59,6 +60,7 @@ export default function Signup() {
         )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          {/* Name Input */}
           <div>
             <label className="block mb-2 text-sm font-bold text-gray-900">Full Name:</label>
             <input 
@@ -72,6 +74,7 @@ export default function Signup() {
             )}
           </div>
 
+          {/* Email Input */}
           <div>
             <label className="block mb-2 text-sm font-bold text-gray-900">Email Address:</label>
             <input 
@@ -86,6 +89,7 @@ export default function Signup() {
             )}
           </div>
 
+          {/* Password Input */}
           <div>
             <label className="block mb-2 text-sm font-bold text-gray-900">Password:</label>
             <div className="relative">
@@ -109,6 +113,7 @@ export default function Signup() {
             )}
           </div>
 
+          {/* Confirm Password Input */}
           <div>
             <label className="block mb-2 text-sm font-bold text-gray-900">Confirm Password:</label>
             <div className="relative">
@@ -132,6 +137,7 @@ export default function Signup() {
             )}
           </div>
 
+          {/* Submit Button */}
           <button 
             disabled={loading}
             className="w-full px-2 py-2 mt-6 font-bold text-white bg-[#212121] rounded hover:bg-opacity-90 disabled:opacity-70"
@@ -139,6 +145,7 @@ export default function Signup() {
             {loading ? 'Signing up...' : 'Sign up'}
           </button>
 
+          {/* Link to login page */}
           <div className="text-center">
             <p className="text-sm">
               Already have an account?{' '}
